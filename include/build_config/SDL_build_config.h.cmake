@@ -276,6 +276,7 @@
 #cmakedefine SDL_AUDIO_DRIVER_PS2 1
 #cmakedefine SDL_AUDIO_DRIVER_N3DS 1
 #cmakedefine SDL_AUDIO_DRIVER_QNX 1
+#cmakedefine SDL_AUDIO_DRIVER_OGC 1
 
 /* Enable various input drivers */
 #cmakedefine SDL_INPUT_LINUXEV 1
@@ -294,6 +295,7 @@
 #cmakedefine SDL_JOYSTICK_LINUX 1
 #cmakedefine SDL_JOYSTICK_MFI 1
 #cmakedefine SDL_JOYSTICK_N3DS 1
+#cmakedefine SDL_JOYSTICK_OGC 1
 #cmakedefine SDL_JOYSTICK_PS2 1
 #cmakedefine SDL_JOYSTICK_PSP 1
 #cmakedefine SDL_JOYSTICK_RAWINPUT 1
@@ -339,6 +341,7 @@
 #cmakedefine SDL_THREAD_PSP 1
 #cmakedefine SDL_THREAD_PS2 1
 #cmakedefine SDL_THREAD_N3DS 1
+#cmakedefine SDL_THREAD_OGC 1
 
 /* Enable various RTC systems */
 #cmakedefine SDL_TIME_UNIX 1
@@ -347,6 +350,7 @@
 #cmakedefine SDL_TIME_PSP 1
 #cmakedefine SDL_TIME_PS2 1
 #cmakedefine SDL_TIME_N3DS 1
+#cmakedefine SDL_TIME_OGC 1
 
 /* Enable various timer systems */
 #cmakedefine SDL_TIMER_HAIKU 1
@@ -356,6 +360,7 @@
 #cmakedefine SDL_TIMER_PSP 1
 #cmakedefine SDL_TIMER_PS2 1
 #cmakedefine SDL_TIMER_N3DS 1
+#cmakedefine SDL_TIMER_OGC 1
 
 /* Enable various video drivers */
 #cmakedefine SDL_VIDEO_DRIVER_ANDROID 1
@@ -367,6 +372,7 @@
 #cmakedefine SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC @SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC@
 #cmakedefine SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC_GBM @SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC_GBM@
 #cmakedefine SDL_VIDEO_DRIVER_N3DS 1
+#cmakedefine SDL_VIDEO_DRIVER_OGC 1
 #cmakedefine SDL_VIDEO_DRIVER_OFFSCREEN 1
 #cmakedefine SDL_VIDEO_DRIVER_PS2 1
 #cmakedefine SDL_VIDEO_DRIVER_PSP 1
@@ -412,6 +418,7 @@
 #cmakedefine SDL_VIDEO_RENDER_GPU 1
 #cmakedefine SDL_VIDEO_RENDER_METAL 1
 #cmakedefine SDL_VIDEO_RENDER_VULKAN 1
+#cmakedefine SDL_VIDEO_RENDER_OGC 1
 #cmakedefine SDL_VIDEO_RENDER_OGL 1
 #cmakedefine SDL_VIDEO_RENDER_OGL_ES2 1
 #cmakedefine SDL_VIDEO_RENDER_PS2 1
@@ -465,6 +472,7 @@
 #cmakedefine SDL_FILESYSTEM_PSP 1
 #cmakedefine SDL_FILESYSTEM_PS2 1
 #cmakedefine SDL_FILESYSTEM_N3DS 1
+#cmakedefine SDL_FILESYSTEM_OGC 1
 
 /* Enable system storage support */
 #cmakedefine SDL_STORAGE_STEAM @SDL_STORAGE_STEAM@

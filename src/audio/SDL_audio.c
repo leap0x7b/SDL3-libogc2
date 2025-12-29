@@ -77,6 +77,9 @@ static const AudioBootStrap *const bootstrap[] = {
 #ifdef SDL_AUDIO_DRIVER_N3DS
     &N3DSAUDIO_bootstrap,
 #endif
+#ifdef SDL_AUDIO_DRIVER_OGC
+    &OGCAUDIO_bootstrap,
+#endif
 #ifdef SDL_AUDIO_DRIVER_EMSCRIPTEN
     &EMSCRIPTENAUDIO_bootstrap,
 #endif
@@ -2588,4 +2591,3 @@ void SDL_UpdateAudio(void)
         SDL_free(i);
     }
 }
-
