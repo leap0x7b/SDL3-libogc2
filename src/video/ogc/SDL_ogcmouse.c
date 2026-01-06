@@ -235,17 +235,17 @@ void OGC_draw_cursor(SDL_VideoDevice *_this)
     /* mark the texture as invalid */
     s_cursor_background.x = SHRT_MIN;
 
-    if (!mouse || !mouse->cursor_shown ||
+    if (!mouse || !mouse->cursor_visible ||
         !mouse->cur_cursor || !mouse->cur_cursor->internal) {
         return;
     }
 
     /* If this is the default cursor, rotate it, and if it's not pointed at the
      * screen, hide it */
-    if (mouse->cur_cursor == mouse->def_cursor) {
+    if (mouse->cur_cursor == mouse->def_cursor && SDL_WasInit(SDL_INIT_JOYSTICK)) {
         WPADData *data = WPAD_Data(0);  // Use first Wiimote for cursor
+        if (!data || !data->ir.valid) return;
         angle = data->ir.angle;
-        if (!data->ir.valid) return;
     }
 
     screen_w = _this->displays[0]->current_mode->w;
@@ -332,7 +332,7 @@ void OGC_restore_viewport(SDL_VideoDevice *_this)
     /* Restore default state for SDL (opengx restores it at every frame, so we
      * don't care about it) */
     s_2d_viewport_setup = false;
-    GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+    GX_SetZMode(GX_DISABLE, GX_ALWAYS, GX_FALSE);
     GX_SetCurrentMtx(GX_PNMTX0);
     if (_this->windows) {
         /* Restore previous viewport for the renderer */

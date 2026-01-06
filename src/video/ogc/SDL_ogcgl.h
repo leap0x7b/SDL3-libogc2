@@ -27,7 +27,7 @@
 #include "../SDL_sysvideo.h"
 
 bool SDL_OGC_GL_LoadLibrary(SDL_VideoDevice *_this, const char *path);
-void *SDL_OGC_GL_GetProcAddress(SDL_VideoDevice *_this, const char *proc);
+SDL_FunctionPointer SDL_OGC_GL_GetProcAddress(SDL_VideoDevice *_this, const char *proc);
 void SDL_OGC_GL_UnloadLibrary(SDL_VideoDevice *_this);
 SDL_GLContext SDL_OGC_GL_CreateContext(SDL_VideoDevice *_this, SDL_Window * window);
 bool SDL_OGC_GL_MakeCurrent(SDL_VideoDevice *_this, SDL_Window * window, SDL_GLContext context);

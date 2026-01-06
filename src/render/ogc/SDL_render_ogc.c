@@ -174,7 +174,7 @@ static bool OGC_CreateTexture(SDL_Renderer *renderer, SDL_Texture *texture, SDL_
 
     ogc_tex = SDL_calloc(1, sizeof(OGC_TextureData));
     if (!ogc_tex) {
-        return false;
+        return SDL_OutOfMemory();
     }
 
     ogc_tex->format = OGC_texture_format_from_SDL(texture->format);
@@ -184,7 +184,7 @@ static bool OGC_CreateTexture(SDL_Renderer *renderer, SDL_Texture *texture, SDL_
     ogc_tex->texels = memalign(32, texture_size);
     if (!ogc_tex->texels) {
         SDL_free(ogc_tex);
-        return false;
+        return SDL_OutOfMemory();
     }
 
     texture->internal = ogc_tex;
@@ -197,9 +197,6 @@ static bool OGC_LockTexture(SDL_Renderer *renderer, SDL_Texture *texture,
     OGC_TextureData *ogc_tex = texture->internal;
 
     ogc_tex->pixels = SDL_malloc(rect->w * rect->h * SDL_BYTESPERPIXEL(texture->format));
-    if (!ogc_tex->pixels) {
-        return false;
-    }
     ogc_tex->pixels_pitch = rect->w * SDL_BYTESPERPIXEL(texture->format);
     ogc_tex->pixels_rect = *rect;
     *pixels = ogc_tex->pixels;
@@ -281,8 +278,7 @@ static bool OGC_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
          * to NULL (the screen). */
         if (!data->saved_efb_texture)
             data->saved_efb_texture = create_efb_texture(data, renderer->window);
-        if (data->saved_efb_texture)
-            save_efb_to_texture(data->saved_efb_texture, false);
+        save_efb_to_texture(data->saved_efb_texture, false);
     }
 
     if (texture) {
@@ -346,15 +342,14 @@ static bool OGC_QueueFillRects(SDL_Renderer *renderer, SDL_RenderCommand *cmd,
 
     cmd->data.draw.count = count;
     for (int i = 0; i < count; i++) {
-        int base = i * 4;
-        vertices[base].x = rects[i].x;
-        vertices[base].y = rects[i].y;
-        vertices[base+1].x = rects[i].x + rects[i].w;
-        vertices[base+1].y = rects[i].y;
-        vertices[base+2].x = rects[i].x + rects[i].w;
-        vertices[base+2].y = rects[i].y + rects[i].h;
-        vertices[base+3].x = rects[i].x;
-        vertices[base+3].y = rects[i].y + rects[i].h;
+        vertices[i].x = rects[i].x;
+        vertices[i].y = rects[i].y;
+        vertices[i+1].x = rects[i].x + rects[i].w;
+        vertices[i+1].y = rects[i].y;
+        vertices[i+2].x = rects[i].x + rects[i].w;
+        vertices[i+2].y = rects[i].y + rects[i].h;
+        vertices[i+3].x = rects[i].x;
+        vertices[i+3].y = rects[i].y + rects[i].h;
     }
     return true;
 }
@@ -620,47 +615,33 @@ static bool OGC_RunCommandQueue(SDL_Renderer *renderer, SDL_RenderCommand *cmd, 
     while (cmd) {
         switch (cmd->command) {
         case SDL_RENDERCMD_SETVIEWPORT:
-            if (!OGC_RenderSetViewPort(renderer, cmd)) {
-                return false;
-            }
+            OGC_RenderSetViewPort(renderer, cmd);
             break;
         case SDL_RENDERCMD_SETCLIPRECT:
-            if (!OGC_RenderSetClipRect(renderer, cmd)) {
-                return false;
-            }
+            OGC_RenderSetClipRect(renderer, cmd);
             break;
         case SDL_RENDERCMD_SETDRAWCOLOR:
             /* This is a no-op, since every command carries the color, and
              * setting it on the FIFO is not expensive. */
             break;
         case SDL_RENDERCMD_CLEAR:
-            if (!OGC_RenderClear(renderer, cmd)) {
-                return false;
-            }
+            OGC_RenderClear(renderer, cmd);
             break;
         case SDL_RENDERCMD_DRAW_POINTS:
-            if (!OGC_RenderPrimitive(renderer, GX_POINTS, vertices, cmd)) {
-                return false;
-            }
+            OGC_RenderPrimitive(renderer, GX_POINTS, vertices, cmd);
             break;
         case SDL_RENDERCMD_DRAW_LINES:
-            if (!OGC_RenderPrimitive(renderer, GX_LINESTRIP, vertices, cmd)) {
-                return false;
-            }
+            OGC_RenderPrimitive(renderer, GX_LINESTRIP, vertices, cmd);
             break;
         case SDL_RENDERCMD_FILL_RECTS:
-            if (!OGC_RenderPrimitive(renderer, GX_QUADS, vertices, cmd)) {
-                return false;
-            }
+            OGC_RenderPrimitive(renderer, GX_QUADS, vertices, cmd);
             break;
         case SDL_RENDERCMD_COPY: /* unused */
             break;
         case SDL_RENDERCMD_COPY_EX: /* unused */
             break;
         case SDL_RENDERCMD_GEOMETRY:
-            if (!OGC_RenderGeometry(renderer, vertices, cmd)) {
-                return false;
-            }
+            OGC_RenderGeometry(renderer, vertices, cmd);
             break;
         case SDL_RENDERCMD_NO_OP:
             break;
@@ -733,11 +714,12 @@ static bool OGC_CreateRenderer(SDL_Renderer *renderer, SDL_Window *window, SDL_P
 
     SDL_SetupRendererColorspace(renderer, create_props);
     if (renderer->output_colorspace != SDL_COLORSPACE_SRGB) {
-        return false;
+        return SDL_SetError("Unsupported output colorspace");
     }
 
     data = (OGC_RenderData *)SDL_calloc(1, sizeof(*data));
     if (!data) {
+        SDL_OutOfMemory();
         return false;
     }
 

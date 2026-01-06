@@ -113,11 +113,9 @@ void OGC_load_texture(void *texels, int w, int h, u8 format,
         GX_InitTexObjLOD(&texobj_a, GX_LINEAR, GX_LINEAR,
                          0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
         break;
-    case SDL_SCALEMODE_NEAREST:
     default:
         GX_InitTexObjLOD(&texobj_a, GX_NEAR, GX_NEAR,
                          0.0f, 0.0f, 0.0f, 0, 0, GX_ANISO_1);
-        break;
     }
     GX_LoadTexObj(&texobj_a, GX_TEXMAP0); // load texture object so its ready to use
 }

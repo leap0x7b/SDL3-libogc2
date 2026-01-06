@@ -113,9 +113,6 @@ static void init_display_mode(SDL_DisplayMode *mode, const GXRModeObj *vmode)
     mode->internal = modedata;
 }
 
-/* Populate the display with supported fullscreen modes derived from the
- * libogc GX mode lists. These are added as fullscreen modes (SDL3-style)
- * so applications can query and select them for exclusive fullscreen. */
 static void add_supported_modes(SDL_VideoDisplay *display, u32 tv_format)
 {
     const GXRModeObj **gx_modes;
@@ -168,8 +165,8 @@ static void setup_video_mode(SDL_VideoDevice *_this, GXRModeObj *vmode)
     VIDEO_Configure(vmode);
 
     /* Allocate the XFB */
-    videodata->xfb[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(vmode));
-    videodata->xfb[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(vmode));
+    videodata->xfb[0] = SYS_AllocateFramebuffer(vmode);
+    videodata->xfb[1] = SYS_AllocateFramebuffer(vmode);
 
     VIDEO_ClearFrameBuffer(vmode, videodata->xfb[0], COLOR_BLACK);
     VIDEO_SetNextFramebuffer(videodata->xfb[0]);
@@ -196,10 +193,8 @@ static bool OGC_SetDisplayMode(SDL_VideoDevice *_this, SDL_VideoDisplay *display
     /* The GX video mode is stored in the internal pointer */
     GXRModeObj *vmode = mode->internal->vmode;
 
-    if (videodata->xfb[0])
-        free(MEM_K1_TO_K0(videodata->xfb[0])); // This should NOT be SDL_free()
-    if (videodata->xfb[1])
-        free(MEM_K1_TO_K0(videodata->xfb[1])); // This should NOT be SDL_free()
+    free(videodata->xfb[0]); // This should NOT be SDL_free()
+    free(videodata->xfb[1]); // This should NOT be SDL_free()
 
     setup_video_mode(_this, vmode);
     return true;
@@ -262,7 +257,7 @@ static SDL_VideoDevice *OGC_CreateDevice(void)
 
 #ifdef SDL_VIDEO_OPENGL
     device->GL_LoadLibrary = SDL_OGC_GL_LoadLibrary;
-    device->GL_GetProcAddress = (SDL_FunctionPointer (*)(SDL_VideoDevice *, const char *))SDL_OGC_GL_GetProcAddress;
+    device->GL_GetProcAddress = SDL_OGC_GL_GetProcAddress;
     device->GL_UnloadLibrary = SDL_OGC_GL_UnloadLibrary;
     device->GL_CreateContext = SDL_OGC_GL_CreateContext;
     device->GL_MakeCurrent = SDL_OGC_GL_MakeCurrent;
@@ -300,7 +295,6 @@ bool OGC_VideoInit(SDL_VideoDevice *_this)
 
     setup_video_mode(_this, vmode);
     GX_SetCopyClear(background, GX_MAX_Z24);
-    SDL_LogDebug(SDL_LOG_CATEGORY_VIDEO, "OGC_VideoInit: GX_SetCopyClear done");
 
     GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
     GX_SetCullMode(GX_CULL_NONE);
@@ -311,7 +305,7 @@ bool OGC_VideoInit(SDL_VideoDevice *_this)
     GX_Flush();
 
     init_display_mode(&mode, vmode);
-    if (SDL_AddBasicVideoDisplay(&mode) == 0) {
+    if (SDL_AddBasicVideoDisplay(&mode) < 0) {
         return false;
     }
 
@@ -335,11 +329,9 @@ void OGC_VideoQuit(SDL_VideoDevice *_this)
     OGC_QuitMouse(_this);
 #endif
 
-    SDL_free(videodata->gp_fifo);
-    if (videodata->xfb[0])
-        free(MEM_K1_TO_K0(videodata->xfb[0])); // This should NOT be SDL_free()
-    if (videodata->xfb[1])
-        free(MEM_K1_TO_K0(videodata->xfb[1])); // This should NOT be SDL_free()
+    free(videodata->gp_fifo);  // This should NOT be SDL_free()
+    free(videodata->xfb[0]); // This should NOT be SDL_free()
+    free(videodata->xfb[1]); // This should NOT be SDL_free()
 
     /* During shutdown, SDL_ResetDisplayModes() will be called and will invoke
      * SDL_free() on driverdata. Nullify the pointers in order to avoid a

@@ -68,7 +68,7 @@ bool SDL_OGC_GL_LoadLibrary(SDL_VideoDevice *_this, const char *path)
     return true;
 }
 
-void *SDL_OGC_GL_GetProcAddress(SDL_VideoDevice *_this, const char *proc)
+SDL_FunctionPointer SDL_OGC_GL_GetProcAddress(SDL_VideoDevice *_this, const char *proc)
 {
     return ogx_get_proc_address(proc);
 }

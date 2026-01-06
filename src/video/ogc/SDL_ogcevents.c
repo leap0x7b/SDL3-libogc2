@@ -68,8 +68,8 @@ static void pump_ir_events(SDL_VideoDevice *_this)
         if (!data->ir.valid) continue;
 
         SDL_SendMouseMotion(0, _this->windows, i, false,
-                            (float)(data->ir.x * screen_w) / 640.0f,
-                            (float)(data->ir.y * screen_h) / 480.0f);
+                            data->ir.x * screen_w / 640,
+                            data->ir.y * screen_h / 480);
 
         for (int b = 0; b < MAX_WII_MOUSE_BUTTONS; b++) {
             if (data->btns_d & s_mouse_button_map[b].wii) {
